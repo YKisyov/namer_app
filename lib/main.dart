@@ -57,49 +57,79 @@ class MyAppState extends ChangeNotifier {
 class MyHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    var appState = context.watch<MyAppState>();
-    var pair = appState.currentWordPair;
-    var buttonClicksCount = appState.currentButtonClicks;
-    var wasLikeButtonPressed = appState.wasLikeButtonPressed;
-
-    IconData icon =
-        wasLikeButtonPressed ? Icons.favorite : Icons.favorite_border;
     return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            BigCard(pair: pair),
-            SizedBox(height: 30), //air
-            Row(
-              mainAxisSize: MainAxisSize.min, // to be tested
-              children: [
-                ElevatedButton.icon(
-                    onPressed: () {
-                      appState.addToFavorites();
-                      print("Like button was pressed.");
-                    },
-                    icon: Icon(
-                      icon,
-                      color: Colors.red,
-                    ),
-                    label: Text(wasLikeButtonPressed ? "Liked" : "Like")),
-                SizedBox(
-                  width: 10,
+      body: Row(
+        children: [
+          SafeArea(
+            child: NavigationRail(
+              extended: false,
+              destinations: [
+                NavigationRailDestination(
+                  icon: Icon(Icons.home),
+                  label: Text('Home'),
                 ),
-                ElevatedButton(
-                  onPressed: () {
-                    appState.getNext();
-                    print('button pressed!');
-                  },
-                  child: Text(
-                    'Next, button was pressed: $buttonClicksCount.',
-                  ),
+                NavigationRailDestination(
+                  icon: Icon(Icons.favorite),
+                  label: Text('Favorites'),
                 ),
               ],
+              selectedIndex: 0,
+              onDestinationSelected: (value) {
+                print('selected: $value');
+              },
             ),
-          ],
-        ),
+          ),
+          Expanded(
+            child: Container(
+              color: Theme.of(context).colorScheme.primaryContainer,
+              child: GeneratorPage(),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class GeneratorPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    var appState = context.watch<MyAppState>();
+    var pair = appState.currentWordPair;
+
+    IconData icon;
+    if (appState.setOfLikedWordPairs.contains(pair)) {
+      icon = Icons.favorite;
+    } else {
+      icon = Icons.favorite_border;
+    }
+
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          BigCard(pair: pair),
+          SizedBox(height: 10),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ElevatedButton.icon(
+                onPressed: () {
+                  appState.addToFavorites();
+                },
+                icon: Icon(icon),
+                label: Text('Like'),
+              ),
+              SizedBox(width: 10),
+              ElevatedButton(
+                onPressed: () {
+                  appState.getNext();
+                },
+                child: Text('Next'),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
