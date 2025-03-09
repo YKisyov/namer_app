@@ -199,15 +199,27 @@ class FavoritesPage extends StatelessWidget {
       color: theme.colorScheme.inversePrimary,
     );
 
-    return Center(
-      child: ListView(
-        children: [
-          for (WordPair wp in myAppStateObj.setOfLikedWordPairs)
-            BigCard(
-              pair: wp,
-            ),
-        ],
+    if (myAppStateObj.setOfLikedWordPairs.isEmpty) {
+      return Center(
+          child: Text(
+        "No favorites yet.",
+        style: textStyle,
+      ));
+    }
+
+    return ListView(children: [
+      Padding(
+        padding: const EdgeInsets.all(20),
+        child: Text(
+            "You have ${myAppStateObj.setOfLikedWordPairs.length} favorites"),
       ),
-    );
+      for (WordPair wp in myAppStateObj.setOfLikedWordPairs)
+        Center(
+          child: ListTile(
+            leading: Icon(Icons.favorite),
+            title: Text(wp.asCamelCase),
+          ),
+        ),
+    ]);
   }
 }
